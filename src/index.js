@@ -9,7 +9,12 @@ const { PORT = 4000 } = process.env
 connectDB()
 
 async function startApolloServer() {
-  const server = new ApolloServer({ typeDefs, resolvers, playground: true })
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    playground: true,
+    context: ({ req, res }) => ({ req, res }),
+  })
   await server.start()
 
   const app = express()
