@@ -3,8 +3,20 @@ import bcrypt from "bcryptjs"
 
 const userSchema = new mongoose.Schema(
   {
-    email: String,
-    username: String,
+    email: {
+      type: String,
+      validate: {
+        validator: (email) => User.doesntExist({ email }),
+        message: ({ value }) => `Email ${value} has already been taken`, //security risk. fix later
+      },
+    },
+    username: {
+      type: String,
+      validate: {
+        validator: (username) => User.doesntExist({ username }),
+        message: ({ value }) => `Username ${value} has already been taken`, //security risk. fix later
+      },
+    },
     name: String,
     password: String,
   },
@@ -13,15 +25,19 @@ const userSchema = new mongoose.Schema(
   }
 )
 
+userSchema.statics.doesntExist = async function (options) {
+  return (await this.where(options).countDocuments()) === 0
+}
+
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    try {
-      const salt = await bcrypt.genSalt(10)
-      this.password = await bcrypt.hash(this.password, salt)
-    } catch (error) {
-      next(error)
-    }
+  if (!this.isModified("password")) {
+    next()
   }
+
+  const salt = await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password, salt)
 })
 
-export default mongoose.model("User", userSchema)
+const User = mongoose.model("User", userSchema)
+
+export default User
