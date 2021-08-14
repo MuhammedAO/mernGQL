@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 import { UserInputError } from "apollo-server-express"
 import { User } from "../models/index.js"
+import { schema } from "../schemas/user.js"
 
 export default {
   /*Apollo handles promises rejection and resolution on its own */
@@ -19,8 +20,10 @@ export default {
   },
 
   Mutation: {
-    signUp: (parent, args, context, info) => {
+    signUp: async (parent, args, context, info) => {
       //Todo: !Auth, Validation
+
+      await schema.validateAsync(args, { abortEarly: false })
 
       return User.create(args)
     },
