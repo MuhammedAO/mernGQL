@@ -3,7 +3,7 @@ import { mongoURI } from "./keys.js"
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(mongoURI, {
+    const conn = await mongoose.connect(process.env.mongoURI, {
       useCreateIndex: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
