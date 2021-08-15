@@ -29,6 +29,11 @@ userSchema.statics.doesntExist = async function (options) {
   return (await this.where(options).countDocuments()) === 0
 }
 
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password)
+}
+
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next()
